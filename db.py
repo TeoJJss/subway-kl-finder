@@ -16,7 +16,9 @@ def create_db():
             NAME VARCHAR(255) PRIMARY KEY NOT NULL,
             ADDRESS VARCHAR(255),
             OPERATING_HOUR VARCHAR(255),
-            WAZE_LINK VARCHAR(255)
+            WAZE_LINK VARCHAR(255),
+            LONGITUDE VARCHAR(255),
+            LATITUDE VARCHAR(255)
         )
         '''
     execute_sql(create_table_sql)

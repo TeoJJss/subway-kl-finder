@@ -14,7 +14,7 @@ if not os.path.isfile(DB_NAME):
     create_db()
 
 insert_sql = """
-                INSERT INTO OUTLETS (NAME, ADDRESS, OPERATING_HOUR, WAZE_LINK)
+                INSERT INTO OUTLETS (NAME, ADDRESS, OPERATING_HOUR, WAZE_LINK, LONGITUDE, LATITUDE)
                 VALUES 
             """
 
@@ -37,7 +37,7 @@ try:
 
     # Loop through the search results
     for result in search_results:
-        waze=""
+        waze=latitude=longitude=""
         target=result.text.split("\n")
         tmp_data = {
             "name": "",
@@ -47,6 +47,9 @@ try:
         }
         try:
             classname = result.get_attribute('class').split(" ")[1]
+            latitude = result.get_attribute("data-latitude")
+            longitude = result.get_attribute("data-longitude")
+
             waze = driver.find_element(By.CSS_SELECTOR, f'.{classname} a:nth-of-type(2)').get_attribute('href')
             tmp_data['name'] = target[0]
             tmp_data['address'] = target[1]
@@ -54,7 +57,7 @@ try:
             tmp_data['waze_link'] = waze
 
             json_resp['data'].append(tmp_data)
-            insert_sql += f"('{target[0]}', '{target[1]}', '{target[2]}', '{waze}'),"
+            insert_sql += f"('{target[0]}', '{target[1]}', '{target[2]}', '{waze}', '{longitude}', '{latitude}'),"
         except:
             pass
         i+=1
