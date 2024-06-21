@@ -7,7 +7,7 @@ conn = sqlite3.connect("outlets.db")
 cursor = conn.cursor()
 
 # Execute a SELECT statement
-cursor.execute("SELECT * FROM OUTLETS")
+cursor.execute("SELECT * FROM KL_OUTLETS")
 
 # Fetch and print all rows
 rows = cursor.fetchall()
