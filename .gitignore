@@ -1,0 +1,5 @@
+.git
+venv
+*.db
+result.json
+__pycache__
