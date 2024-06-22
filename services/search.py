@@ -1,5 +1,5 @@
 from nltk import word_tokenize, pos_tag, ne_chunk
-from db import location_outlets, read_kl_outlets, find_latest_closing
+from db import get_location_outlets, read_kl_outlets, find_latest_closing
 import nltk, datetime
 from nltk.corpus import wordnet
 from fastapi.responses import JSONResponse
@@ -13,7 +13,7 @@ def preprocess_text(text):
     return tokens
 
 def extract_location_entities(text):
-    tokens = word_tokenize(text)
+    tokens = word_tokenize(text) 
     tagged_tokens = pos_tag(tokens)
     ne_tree = ne_chunk(tagged_tokens)
     locations = []
@@ -60,12 +60,20 @@ def find_latest_closing_outlets():
         except Exception as e:
             pass
     
-    latest_outlets = find_latest_closing(latest_time)
+    latest_outlets = find_latest_closing(latest_time.replace(" ", "")) # rm space because there is outlet with "10 PM" and "10PM"
     for outlet in latest_outlets:
         latest_outlet_coor = (outlet[-1], outlet[-2]) # latitude, longitude
-        latest_ls.append({"name": outlet[0], "closing_time": outlet[2], "coordinate": latest_outlet_coor})
+        latest_ls.append({"name": outlet[0], "operating_hour": outlet[2], "coordinate": latest_outlet_coor})
     
     return latest_ls
+
+def find_location_outlets(location):
+    location_outlets = get_location_outlets(location)
+    location_outlets_ls = []
+    for outlet in location_outlets:
+        outlet_coor = (outlet[-1], outlet[-2]) # latitude, longitude
+        location_outlets_ls.append({"name": outlet[0], "coordinate": outlet_coor})
+    return location_outlets_ls
 
 def query_handler(query):
     intent = determine_intent(query)
@@ -86,7 +94,8 @@ def query_handler(query):
         print("Outlets in Location:",location)
 
         if location:
-            q_result = location_outlets(location) 
+            q_result = find_location_outlets(location) 
+            print(q_result)
             count = len(q_result)
             print("Number of outlets in {}: {}".format(location, count))
         else:
@@ -95,7 +104,7 @@ def query_handler(query):
         resp ={
             "data": q_result
         }
-        status = 200 if count else 400
+        status = 200
 
     else:
         print("unsupported")
@@ -106,5 +115,5 @@ def query_handler(query):
         }
         status = 400
 
-    resp["type"] = intent[0]
+    resp["type"] = intent[0] 
     return JSONResponse(content=resp, status_code=status)

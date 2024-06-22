@@ -50,7 +50,7 @@ def read_kl_outlets():
     results = execute_read_sql(select_sql)
     return results
 
-def location_outlets(location):
+def get_location_outlets(location):
     count_sql = "SELECT NAME, ADDRESS, OPERATING_HOUR, WAZE_LINK, LONGITUDE, LATITUDE FROM KL_OUTLETS WHERE ADDRESS LIKE ?"
     param = [f"%{location}%"]
 
@@ -58,7 +58,7 @@ def location_outlets(location):
     return result
 
 def find_latest_closing(time):
-    select_sql = "SELECT NAME, ADDRESS, OPERATING_HOUR, WAZE_LINK, LONGITUDE, LATITUDE FROM KL_OUTLETS WHERE OPERATING_HOUR LIKE ?"
+    select_sql = "SELECT NAME, ADDRESS, OPERATING_HOUR, WAZE_LINK, LONGITUDE, LATITUDE FROM KL_OUTLETS WHERE REPLACE(OPERATING_HOUR, ' ', '') LIKE ?"
     param = [f"%{time}%"]
 
     results = execute_read_sql_w_param(select_sql, param)
