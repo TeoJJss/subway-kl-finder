@@ -7,9 +7,13 @@ import json, os
 from config import DB_NAME, URL, TARGET_LOCATION
 from db import execute_sql, create_db, read_kl_outlets
 from fastapi.responses import JSONResponse
+from selenium.webdriver.chrome.options import Options
 
 def find_kl_outlets():
-    driver = webdriver.Chrome()
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')  # Run in headless mode
+    chrome_options.add_argument('--disable-gpu')
+    driver = webdriver.Chrome(options=chrome_options)
     driver.get(URL)
 
     if not os.path.isfile(DB_NAME):
