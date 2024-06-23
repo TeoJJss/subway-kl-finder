@@ -3,6 +3,7 @@ from db import get_location_outlets, read_kl_outlets, find_latest_closing
 import nltk, datetime
 from nltk.corpus import wordnet
 from fastapi.responses import JSONResponse
+from nltk.tree import Tree
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('maxent_ne_chunker')
@@ -18,8 +19,9 @@ def extract_location_entities(text):
     ne_tree = ne_chunk(tagged_tokens)
     locations = []
     for subtree in ne_tree:
-        if hasattr(subtree, 'label') and subtree.label() in ['GPE', 'LOC']:
-            locations.append(' '.join([token[0] for token in subtree]))
+        if isinstance(subtree, Tree) and (subtree.label() == 'GPE' or subtree.label() == 'LOC'):
+            locations.append(' '.join([token[0] for token in subtree.leaves()]))
+    print("Locations: ", locations)
     return locations
 
 def determine_intent(query):
